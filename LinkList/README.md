@@ -224,3 +224,293 @@ if __name__ == "__main__":
 <hr>
 <hr>
 <hr>
+
+Here are the implementations of a doubly linked list (DLL) in C, Python, and Java, with detailed explanations and comments in the code.
+
+---
+
+### **C Implementation of a Doubly Linked List**
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+// Node structure for doubly linked list
+struct Node {
+    int data;
+    struct Node* prev; // Pointer to the previous node
+    struct Node* next; // Pointer to the next node
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to insert a node at the front of the list
+void insertFront(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
+    newNode->next = *head;
+
+    if (*head != NULL)
+        (*head)->prev = newNode;
+
+    *head = newNode;
+}
+
+// Function to print the list forward
+void printList(struct Node* node) {
+    struct Node* last;
+    printf("Traversal in forward direction: \n");
+    while (node != NULL) {
+        printf("%d ", node->data);
+        last = node;
+        node = node->next;
+    }
+
+    printf("\nTraversal in reverse direction: \n");
+    while (last != NULL) {
+        printf("%d ", last->data);
+        last = last->prev;
+    }
+}
+
+// Main function to test the doubly linked list
+int main() {
+    struct Node* head = NULL;
+
+    // Insert nodes into the list
+    insertFront(&head, 10);
+    insertFront(&head, 20);
+    insertFront(&head, 30);
+
+    // Print the list
+    printList(head);
+
+    return 0;
+}
+```
+
+#### **Explanation (C)**
+- **Node Structure**: Each node has an integer data field, a `prev` pointer pointing to the previous node, and a `next` pointer pointing to the next node.
+- **Insert Front**: We insert a new node at the front of the list, update pointers to maintain DLL properties.
+- **Traversal**: The list is printed in both forward and reverse directions to demonstrate how the doubly linked pointers work.
+
+### **What is `malloc` in C?**
+
+`malloc` stands for **memory allocation** and is a function in the C standard library (specifically in `stdlib.h`) that dynamically allocates memory during runtime. Unlike static or stack memory allocation (where memory is allocated at compile time or automatically at function call), dynamic memory allocation allows a program to request memory as needed while it's running.
+
+Here’s what `malloc` does:
+
+- **Allocates a block of memory on the heap**: `malloc` allocates a specified number of bytes from the heap (a region of memory for dynamic allocation), which persists until explicitly deallocated.
+- **Returns a pointer to the allocated memory**: If successful, `malloc` returns a pointer to the beginning of the allocated block of memory. The pointer is of type `void*`, which means it can be cast to any pointer type (like `int*`, `char*`, etc.).
+- **Initializes memory to garbage**: The memory allocated by `malloc` is not initialized, so it contains whatever values were previously stored in that memory location (referred to as "garbage values").
+
+### **Syntax of `malloc`**
+
+```c
+void* malloc(size_t size);
+```
+
+- **`size_t size`**: This argument specifies the number of bytes to allocate. You typically use `sizeof(type)` to calculate the size required for the data type.
+- **Returns**: On success, it returns a pointer to the allocated memory. On failure (e.g., if there’s not enough memory available), it returns `NULL`.
+
+### **Example of `malloc` in C**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    // Allocate memory for an integer
+    int *ptr = (int*) malloc(sizeof(int));
+
+    // Check if the memory allocation was successful
+    if (ptr == NULL) {
+        printf("Memory allocation failed\n");
+        return 1; // Exit if memory allocation failed
+    }
+
+    // Store a value in the allocated memory
+    *ptr = 42;
+    printf("Value at ptr: %d\n", *ptr);
+
+    // Free the allocated memory when no longer needed
+    free(ptr);
+
+    return 0;
+}
+```
+
+### **Explanation**
+1. **`int *ptr = (int*) malloc(sizeof(int));`**:
+   - This line allocates enough memory for an integer (`sizeof(int)` usually returns 4 bytes).
+   - The result of `malloc` is cast to `(int*)` to assign the correct type to the pointer.
+   - If successful, `ptr` will now point to the newly allocated memory block where we can store an integer.
+   
+2. **Error Handling (`if (ptr == NULL)`)**:
+   - It's important to check whether `malloc` returns `NULL`, which indicates a memory allocation failure (e.g., insufficient memory).
+   
+3. **Storing a Value (`*ptr = 42;`)**:
+   - The allocated memory is used to store the integer value `42` by dereferencing the pointer (`*ptr`).
+
+4. **Freeing Memory (`free(ptr);`)**:
+   - Dynamically allocated memory using `malloc` does **not** get freed automatically. You must call `free(ptr)` when you are done using the memory, to avoid memory leaks.
+
+### **Why Use `malloc`?**
+- **Dynamic Memory Allocation**: When the size of an array or data structure cannot be determined at compile time (e.g., user input determines the size), `malloc` allows you to allocate memory on the fly during program execution.
+- **Heap vs. Stack**: Variables allocated on the heap persist until they are explicitly freed, while variables on the stack (local variables) are automatically freed when they go out of scope (e.g., when a function ends).
+
+### **Common Mistakes with `malloc`**
+- **Not Checking for `NULL`**: Always check if `malloc` returns `NULL` to handle cases where memory allocation fails.
+- **Memory Leaks**: Forgetting to `free` memory after use causes memory leaks, where allocated memory isn't reclaimed, leading to inefficient memory usage.
+- **Dangling Pointers**: After freeing memory, the pointer should be set to `NULL` to avoid accessing freed memory.
+
+---
+
+In summary, `malloc` is a powerful tool in C for dynamically managing memory at runtime, but with great power comes the responsibility of manually managing memory and avoiding common pitfalls like leaks and invalid access.
+
+---
+
+### **Python Implementation of a Doubly Linked List**
+```python
+# Node class for doubly linked list
+class Node:
+    def __init__(self, data):
+        self.data = data  # Initialize data
+        self.prev = None  # Pointer to previous node
+        self.next = None  # Pointer to next node
+
+# Doubly linked list class
+class DoublyLinkedList:
+    def __init__(self):
+        self.head = None  # Initialize head of the list
+
+    # Function to insert a node at the front of the list
+    def insert_front(self, data):
+        new_node = Node(data)  # Create a new node
+        new_node.next = self.head  # Make new node point to head
+
+        if self.head is not None:
+            self.head.prev = new_node  # Update previous head's prev pointer
+
+        self.head = new_node  # Update head to new node
+
+    # Function to print list in forward direction
+    def print_list(self):
+        current = self.head
+        print("Traversal in forward direction:")
+        while current:
+            print(current.data, end=' ')
+            last = current  # Save the last node to traverse backwards
+            current = current.next
+
+        print("\nTraversal in reverse direction:")
+        while last:
+            print(last.data, end=' ')
+            last = last.prev
+
+# Test the doubly linked list
+dll = DoublyLinkedList()
+dll.insert_front(10)
+dll.insert_front(20)
+dll.insert_front(30)
+
+dll.print_list()
+```
+
+#### **Explanation (Python)**
+- **Node Class**: Defines a `Node` with a data field, `prev` pointer, and `next` pointer.
+- **DoublyLinkedList Class**: Manages the operations for inserting nodes at the front and printing the list.
+- **Traversal**: As in the C version, the list is printed both forward and backward to illustrate the DLL structure.
+
+---
+
+### **Java Implementation of a Doubly Linked List**
+```java
+// Node class for doubly linked list
+class Node {
+    int data;
+    Node prev; // Pointer to previous node
+    Node next; // Pointer to next node
+
+    // Constructor to create a new node
+    public Node(int data) {
+        this.data = data;
+        this.prev = null;
+        this.next = null;
+    }
+}
+
+// Doubly linked list class
+class DoublyLinkedList {
+    Node head; // Head of the list
+
+    // Constructor to initialize an empty list
+    public DoublyLinkedList() {
+        this.head = null;
+    }
+
+    // Function to insert a node at the front
+    public void insertFront(int data) {
+        Node newNode = new Node(data);
+        newNode.next = head;
+
+        if (head != null)
+            head.prev = newNode;
+
+        head = newNode;
+    }
+
+    // Function to print the list in forward direction
+    public void printList() {
+        Node current = head;
+        Node last = null;
+        System.out.println("Traversal in forward direction:");
+        while (current != null) {
+            System.out.print(current.data + " ");
+            last = current; // Track last node for reverse printing
+            current = current.next;
+        }
+
+        System.out.println("\nTraversal in reverse direction:");
+        while (last != null) {
+            System.out.print(last.data + " ");
+            last = last.prev;
+        }
+    }
+
+    // Main function to test the doubly linked list
+    public static void main(String[] args) {
+        DoublyLinkedList dll = new DoublyLinkedList();
+
+        // Insert nodes at the front
+        dll.insertFront(10);
+        dll.insertFront(20);
+        dll.insertFront(30);
+
+        // Print the doubly linked list
+        dll.printList();
+    }
+}
+```
+
+#### **Explanation (Java)**
+- **Node Class**: Contains `data`, `prev`, and `next` pointers to store node information and maintain doubly linked structure.
+- **DoublyLinkedList Class**: Handles insertion and printing functions.
+- **Traversal**: List is printed forward and backward using the doubly linked pointers.
+
+---
+
+### **Key Points Across All Implementations**
+1. **Node Creation**: Each node contains three components: `data`, a pointer to the `prev` node, and a pointer to the `next` node.
+2. **Insertion at Front**: For inserting a node at the front, pointers are adjusted to maintain the doubly linked structure.
+3. **Traversal**: The DLL is traversed in both forward and reverse directions to show the bidirectional nature of the structure.
+4. **Memory Management**: In C, memory is manually managed using `malloc` and `free`, while Python and Java handle memory automatically.
+
+<hr>
+<hr>
+<hr>
