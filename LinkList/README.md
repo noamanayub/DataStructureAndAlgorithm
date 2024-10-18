@@ -514,3 +514,179 @@ class DoublyLinkedList {
 <hr>
 <hr>
 <hr>
+
+A circular linked list is a variation of a singly linked list where the last node points back to the first node instead of pointing to `null`. This creates a circular structure, allowing traversal to continue indefinitely or until a specific condition is met. Circular linked lists can be either singly or doubly linked.
+
+### Key Characteristics:
+1. **Circular Traversal**: You can traverse the list indefinitely by following the next pointers.
+2. **Efficient Insertion/Deletion**: Inserting or deleting nodes at the beginning or end of the list is efficient.
+3. **Applications**: Used in scenarios where you need to cycle through elements repeatedly, such as in round-robin scheduling, circular buffers, etc.
+
+### Example: Singly Circular Linked List
+
+#### Java
+```java
+class Node {
+    int data;
+    Node next;
+
+    Node(int data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+class CircularLinkedList {
+    Node head;
+
+    CircularLinkedList() {
+        head = null;
+    }
+
+    void insert(int data) {
+        Node newNode = new Node(data);
+        if (head == null) {
+            head = newNode;
+            newNode.next = head;
+        } else {
+            Node temp = head;
+            while (temp.next != head) {
+                temp = temp.next;
+            }
+            temp.next = newNode;
+            newNode.next = head;
+        }
+    }
+
+    void display() {
+        if (head == null) {
+            System.out.println("List is empty");
+            return;
+        }
+        Node temp = head;
+        do {
+            System.out.print(temp.data + " ");
+            temp = temp.next;
+        } while (temp != head);
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        CircularLinkedList list = new CircularLinkedList();
+        list.insert(1);
+        list.insert(2);
+        list.insert(3);
+        list.display();
+    }
+}
+```
+
+#### Python
+```python
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class CircularLinkedList:
+    def __init__(self):
+        self.head = None
+
+    def insert(self, data):
+        new_node = Node(data)
+        if not self.head:
+            self.head = new_node
+            new_node.next = self.head
+        else:
+            temp = self.head
+            while temp.next != self.head:
+                temp = temp.next
+            temp.next = new_node
+            new_node.next = self.head
+
+    def display(self):
+        if not self.head:
+            print("List is empty")
+            return
+        temp = self.head
+        while True:
+            print(temp.data, end=" ")
+            temp = temp.next
+            if temp == self.head:
+                break
+        print()
+
+if __name__ == "__main__":
+    cll = CircularLinkedList()
+    cll.insert(1)
+    cll.insert(2)
+    cll.insert(3)
+    cll.display()
+```
+
+#### C
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+struct CircularLinkedList {
+    struct Node* head;
+};
+
+void insert(struct CircularLinkedList* list, int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    if (list->head == NULL) {
+        list->head = newNode;
+        newNode->next = list->head;
+    } else {
+        struct Node* temp = list->head;
+        while (temp->next != list->head) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+        newNode->next = list->head;
+    }
+}
+
+void display(struct CircularLinkedList* list) {
+    if (list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    struct Node* temp = list->head;
+    do {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    } while (temp != list->head);
+    printf("\n");
+}
+
+int main() {
+    struct CircularLinkedList list = {NULL};
+    insert(&list, 1);
+    insert(&list, 2);
+    insert(&list, 3);
+    display(&list);
+    return 0;
+}
+```
+
+### Explanation:
+1. **Node Structure**: Each node contains data and a pointer to the next node.
+2. **Circular Linked List Structure**: The list contains a reference to the head node.
+3. **Insertion**: When inserting a new node, if the list is empty, the new node becomes the head and points to itself. Otherwise, traverse to the last node and make it point to the new node, which in turn points to the head.
+4. **Display**: Traverse the list starting from the head and continue until you reach the head again, printing the data of each node.
+
+### Output:
+For all the above implementations, the output will be:
+```
+1 2 3 
+```
+
+This demonstrates the circular nature of the linked list, where the last node points back to the first node.
