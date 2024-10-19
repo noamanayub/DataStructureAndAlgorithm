@@ -690,3 +690,726 @@ For all the above implementations, the output will be:
 ```
 
 This demonstrates the circular nature of the linked list, where the last node points back to the first node.
+
+<hr>
+<hr>
+<hr>
+
+Certainly! Below is a detailed implementation of a singly linked list in C, covering insertion, deletion, searching, traversal, and reversal. I'll explain each part of the code in detail.
+
+### 1. **Node Structure**
+First, we need to define the structure of a node in the linked list.
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for a node in the linked list
+struct Node {
+    int data;           // Data part of the node
+    struct Node* next;  // Pointer to the next node
+};
+```
+
+### 2. **Insertion**
+We will implement three types of insertion:
+- **At the beginning**
+- **At the end**
+- **At a specific position**
+
+#### **Insertion at the Beginning**
+```c
+// Function to insert a node at the beginning of the linked list
+void insertAtBeginning(struct Node** head_ref, int new_data) {
+    // Allocate memory for the new node
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    
+    // Set the data of the new node
+    new_node->data = new_data;
+    
+    // Make the new node point to the current head
+    new_node->next = (*head_ref);
+    
+    // Move the head to point to the new node
+    (*head_ref) = new_node;
+}
+```
+
+#### **Insertion at the End**
+```c
+// Function to insert a node at the end of the linked list
+void insertAtEnd(struct Node** head_ref, int new_data) {
+    // Allocate memory for the new node
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    
+    // Set the data of the new node
+    new_node->data = new_data;
+    
+    // Make the new node point to NULL (as it will be the last node)
+    new_node->next = NULL;
+    
+    // If the list is empty, make the new node the head
+    if (*head_ref == NULL) {
+        *head_ref = new_node;
+        return;
+    }
+    
+    // Traverse to the last node
+    struct Node* last = *head_ref;
+    while (last->next != NULL) {
+        last = last->next;
+    }
+    
+    // Make the last node point to the new node
+    last->next = new_node;
+}
+```
+
+#### **Insertion at a Specific Position**
+```c
+// Function to insert a node at a specific position in the linked list
+void insertAtPosition(struct Node** head_ref, int new_data, int position) {
+    // Allocate memory for the new node
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    
+    // Set the data of the new node
+    new_node->data = new_data;
+    
+    // If the position is 0, insert at the beginning
+    if (position == 0) {
+        new_node->next = (*head_ref);
+        (*head_ref) = new_node;
+        return;
+    }
+    
+    // Traverse to the node just before the position
+    struct Node* current = *head_ref;
+    for (int i = 0; i < position - 1 && current != NULL; i++) {
+        current = current->next;
+    }
+    
+    // If the position is out of bounds, do nothing
+    if (current == NULL) {
+        free(new_node);
+        return;
+    }
+    
+    // Insert the new node at the position
+    new_node->next = current->next;
+    current->next = new_node;
+}
+```
+
+### 3. **Deletion**
+We will implement deletion by value.
+
+```c
+// Function to delete a node with a given value from the linked list
+void deleteNode(struct Node** head_ref, int key) {
+    // Store the head node
+    struct Node* temp = *head_ref;
+    struct Node* prev = NULL;
+    
+    // If the head node itself holds the key to be deleted
+    if (temp != NULL && temp->data == key) {
+        *head_ref = temp->next; // Change head
+        free(temp);             // Free old head
+        return;
+    }
+    
+    // Search for the key to be deleted, keep track of the previous node
+    while (temp != NULL && temp->data != key) {
+        prev = temp;
+        temp = temp->next;
+    }
+    
+    // If the key was not present in the linked list
+    if (temp == NULL) return;
+    
+    // Unlink the node from the linked list
+    prev->next = temp->next;
+    
+    // Free the memory of the deleted node
+    free(temp);
+}
+```
+
+### 4. **Searching**
+We will implement a function to search for a value in the linked list.
+
+```c
+// Function to search for a node with a given value in the linked list
+int searchNode(struct Node* head, int key) {
+    struct Node* current = head;
+    
+    // Traverse the list
+    while (current != NULL) {
+        if (current->data == key) {
+            return 1; // Found
+        }
+        current = current->next;
+    }
+    
+    return 0; // Not found
+}
+```
+
+### 5. **Traversal**
+We will implement a function to traverse and print the linked list.
+
+```c
+// Function to traverse and print the linked list
+void printList(struct Node* node) {
+    while (node != NULL) {
+        printf("%d -> ", node->data);
+        node = node->next;
+    }
+    printf("NULL\n");
+}
+```
+
+### 6. **Reversal**
+We will implement a function to reverse the linked list.
+
+```c
+// Function to reverse the linked list
+void reverseList(struct Node** head_ref) {
+    struct Node* prev = NULL;
+    struct Node* current = *head_ref;
+    struct Node* next = NULL;
+    
+    while (current != NULL) {
+        next = current->next;  // Store the next node
+        current->next = prev;  // Reverse the current node's pointer
+        prev = current;        // Move the pointers one position ahead
+        current = next;
+    }
+    
+    *head_ref = prev;  // Update the head to the new first node
+}
+```
+
+### 7. **Main Function**
+Finally, we will write a `main` function to test all the operations.
+
+```c
+int main() {
+    // Initialize an empty linked list
+    struct Node* head = NULL;
+    
+    // Insert nodes
+    insertAtEnd(&head, 1);
+    insertAtBeginning(&head, 2);
+    insertAtEnd(&head, 3);
+    insertAtPosition(&head, 4, 1);
+    
+    // Print the list
+    printf("Linked list after insertion: ");
+    printList(head);
+    
+    // Delete a node
+    deleteNode(&head, 2);
+    
+    // Print the list after deletion
+    printf("Linked list after deletion: ");
+    printList(head);
+    
+    // Search for a node
+    int key = 3;
+    if (searchNode(head, key)) {
+        printf("%d is found in the list.\n", key);
+    } else {
+        printf("%d is not found in the list.\n", key);
+    }
+    
+    // Reverse the list
+    reverseList(&head);
+    
+    // Print the reversed list
+    printf("Linked list after reversal: ");
+    printList(head);
+    
+    return 0;
+}
+```
+
+### **Explanation of Commands:**
+
+1. **`malloc(sizeof(struct Node))`**: Allocates memory for a new node.
+2. **`new_node->data = new_data`**: Sets the data of the new node.
+3. **`new_node->next = (*head_ref)`**: Makes the new node point to the current head.
+4. **`(*head_ref) = new_node`**: Updates the head to point to the new node.
+5. **`while (last->next != NULL)`**: Traverses the list until the last node.
+6. **`last->next = new_node`**: Links the last node to the new node.
+7. **`free(temp)`**: Frees the memory of the deleted node.
+8. **`printf("%d -> ", node->data)`**: Prints the data of the current node.
+9. **`reverseList(&head)`**: Reverses the linked list.
+
+### **Output:**
+When you run the `main` function, the output will be:
+
+```
+Linked list after insertion: 2 -> 4 -> 1 -> 3 -> NULL
+Linked list after deletion: 4 -> 1 -> 3 -> NULL
+3 is found in the list.
+Linked list after reversal: 3 -> 1 -> 4 -> NULL
+```
+
+This code covers all the basic operations on a linked list in C.
+
+<hr>
+<hr>
+<hr>
+
+Below are the complete implementations of a singly linked list in C, Python, and Java, covering insertion, deletion, searching, traversal, and reversal.
+
+### **C Language Implementation**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for a node in the linked list
+struct Node {
+    int data;           // Data part of the node
+    struct Node* next;  // Pointer to the next node
+};
+
+// Function to insert a node at the beginning of the linked list
+void insertAtBeginning(struct Node** head_ref, int new_data) {
+    // Allocate memory for the new node
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    
+    // Set the data of the new node
+    new_node->data = new_data;
+    
+    // Make the new node point to the current head
+    new_node->next = (*head_ref);
+    
+    // Move the head to point to the new node
+    (*head_ref) = new_node;
+}
+
+// Function to insert a node at the end of the linked list
+void insertAtEnd(struct Node** head_ref, int new_data) {
+    // Allocate memory for the new node
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    
+    // Set the data of the new node
+    new_node->data = new_data;
+    
+    // Make the new node point to NULL (as it will be the last node)
+    new_node->next = NULL;
+    
+    // If the list is empty, make the new node the head
+    if (*head_ref == NULL) {
+        *head_ref = new_node;
+        return;
+    }
+    
+    // Traverse to the last node
+    struct Node* last = *head_ref;
+    while (last->next != NULL) {
+        last = last->next;
+    }
+    
+    // Make the last node point to the new node
+    last->next = new_node;
+}
+
+// Function to insert a node at a specific position in the linked list
+void insertAtPosition(struct Node** head_ref, int new_data, int position) {
+    // Allocate memory for the new node
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    
+    // Set the data of the new node
+    new_node->data = new_data;
+    
+    // If the position is 0, insert at the beginning
+    if (position == 0) {
+        new_node->next = (*head_ref);
+        (*head_ref) = new_node;
+        return;
+    }
+    
+    // Traverse to the node just before the position
+    struct Node* current = *head_ref;
+    for (int i = 0; i < position - 1 && current != NULL; i++) {
+        current = current->next;
+    }
+    
+    // If the position is out of bounds, do nothing
+    if (current == NULL) {
+        free(new_node);
+        return;
+    }
+    
+    // Insert the new node at the position
+    new_node->next = current->next;
+    current->next = new_node;
+}
+
+// Function to delete a node with a given value from the linked list
+void deleteNode(struct Node** head_ref, int key) {
+    // Store the head node
+    struct Node* temp = *head_ref;
+    struct Node* prev = NULL;
+    
+    // If the head node itself holds the key to be deleted
+    if (temp != NULL && temp->data == key) {
+        *head_ref = temp->next; // Change head
+        free(temp);             // Free old head
+        return;
+    }
+    
+    // Search for the key to be deleted, keep track of the previous node
+    while (temp != NULL && temp->data != key) {
+        prev = temp;
+        temp = temp->next;
+    }
+    
+    // If the key was not present in the linked list
+    if (temp == NULL) return;
+    
+    // Unlink the node from the linked list
+    prev->next = temp->next;
+    
+    // Free the memory of the deleted node
+    free(temp);
+}
+
+// Function to search for a node with a given value in the linked list
+int searchNode(struct Node* head, int key) {
+    struct Node* current = head;
+    
+    // Traverse the list
+    while (current != NULL) {
+        if (current->data == key) {
+            return 1; // Found
+        }
+        current = current->next;
+    }
+    
+    return 0; // Not found
+}
+
+// Function to traverse and print the linked list
+void printList(struct Node* node) {
+    while (node != NULL) {
+        printf("%d -> ", node->data);
+        node = node->next;
+    }
+    printf("NULL\n");
+}
+
+// Function to reverse the linked list
+void reverseList(struct Node** head_ref) {
+    struct Node* prev = NULL;
+    struct Node* current = *head_ref;
+    struct Node* next = NULL;
+    
+    while (current != NULL) {
+        next = current->next;  // Store the next node
+        current->next = prev;  // Reverse the current node's pointer
+        prev = current;        // Move the pointers one position ahead
+        current = next;
+    }
+    
+    *head_ref = prev;  // Update the head to the new first node
+}
+
+int main() {
+    // Initialize an empty linked list
+    struct Node* head = NULL;
+    
+    // Insert nodes
+    insertAtEnd(&head, 1);
+    insertAtBeginning(&head, 2);
+    insertAtEnd(&head, 3);
+    insertAtPosition(&head, 4, 1);
+    
+    // Print the list
+    printf("Linked list after insertion: ");
+    printList(head);
+    
+    // Delete a node
+    deleteNode(&head, 2);
+    
+    // Print the list after deletion
+    printf("Linked list after deletion: ");
+    printList(head);
+    
+    // Search for a node
+    int key = 3;
+    if (searchNode(head, key)) {
+        printf("%d is found in the list.\n", key);
+    } else {
+        printf("%d is not found in the list.\n", key);
+    }
+    
+    // Reverse the list
+    reverseList(&head);
+    
+    // Print the reversed list
+    printf("Linked list after reversal: ");
+    printList(head);
+    
+    return 0;
+}
+```
+
+### **Python Implementation**
+
+```python
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def insert_at_beginning(self, new_data):
+        new_node = Node(new_data)
+        new_node.next = self.head
+        self.head = new_node
+
+    def insert_at_end(self, new_data):
+        new_node = Node(new_data)
+        if self.head is None:
+            self.head = new_node
+            return
+        last = self.head
+        while last.next:
+            last = last.next
+        last.next = new_node
+
+    def insert_at_position(self, new_data, position):
+        if position == 0:
+            self.insert_at_beginning(new_data)
+            return
+        new_node = Node(new_data)
+        current = self.head
+        for _ in range(position - 1):
+            if current is None:
+                return
+            current = current.next
+        if current is None:
+            return
+        new_node.next = current.next
+        current.next = new_node
+
+    def delete_node(self, key):
+        temp = self.head
+        if temp is not None and temp.data == key:
+            self.head = temp.next
+            temp = None
+            return
+        prev = None
+        while temp is not None and temp.data != key:
+            prev = temp
+            temp = temp.next
+        if temp is None:
+            return
+        prev.next = temp.next
+        temp = None
+
+    def search_node(self, key):
+        current = self.head
+        while current:
+            if current.data == key:
+                return True
+            current = current.next
+        return False
+
+    def print_list(self):
+        temp = self.head
+        while temp:
+            print(temp.data, end=" -> ")
+            temp = temp.next
+        print("None")
+
+    def reverse_list(self):
+        prev = None
+        current = self.head
+        while current:
+            next_node = current.next
+            current.next = prev
+            prev = current
+            current = next_node
+        self.head = prev
+
+# Test the linked list
+if __name__ == "__main__":
+    llist = LinkedList()
+    llist.insert_at_end(1)
+    llist.insert_at_beginning(2)
+    llist.insert_at_end(3)
+    llist.insert_at_position(4, 1)
+
+    print("Linked list after insertion:")
+    llist.print_list()
+
+    llist.delete_node(2)
+    print("Linked list after deletion:")
+    llist.print_list()
+
+    key = 3
+    if llist.search_node(key):
+        print(f"{key} is found in the list.")
+    else:
+        print(f"{key} is not found in the list.")
+
+    llist.reverse_list()
+    print("Linked list after reversal:")
+    llist.print_list()
+```
+
+### **Java Implementation**
+
+```java
+class Node {
+    int data;
+    Node next;
+
+    Node(int data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+class LinkedList {
+    Node head;
+
+    void insertAtBeginning(int new_data) {
+        Node new_node = new Node(new_data);
+        new_node.next = head;
+        head = new_node;
+    }
+
+    void insertAtEnd(int new_data) {
+        Node new_node = new Node(new_data);
+        if (head == null) {
+            head = new_node;
+            return;
+        }
+        Node last = head;
+        while (last.next != null) {
+            last = last.next;
+        }
+        last.next = new_node;
+    }
+
+    void insertAtPosition(int new_data, int position) {
+        if (position == 0) {
+            insertAtBeginning(new_data);
+            return;
+        }
+        Node new_node = new Node(new_data);
+        Node current = head;
+        for (int i = 0; i < position - 1 && current != null; i++) {
+            current = current.next;
+        }
+        if (current == null) {
+            return;
+        }
+        new_node.next = current.next;
+        current.next = new_node;
+    }
+
+    void deleteNode(int key) {
+        Node temp = head, prev = null;
+        if (temp != null && temp.data == key) {
+            head = temp.next;
+            return;
+        }
+        while (temp != null && temp.data != key) {
+            prev = temp;
+            temp = temp.next;
+        }
+        if (temp == null) {
+            return;
+        }
+        prev.next = temp.next;
+    }
+
+    boolean searchNode(int key) {
+        Node current = head;
+        while (current != null) {
+            if (current.data == key) {
+                return true;
+            }
+            current = current.next;
+        }
+        return false;
+    }
+
+    void printList() {
+        Node temp = head;
+        while (temp != null) {
+            System.out.print(temp.data + " -> ");
+            temp = temp.next;
+        }
+        System.out.println("null");
+    }
+
+    void reverseList() {
+        Node prev = null;
+        Node current = head;
+        Node next = null;
+        while (current != null) {
+            next = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
+        }
+        head = prev;
+    }
+
+    public static void main(String[] args) {
+        LinkedList llist = new LinkedList();
+        llist.insertAtEnd(1);
+        llist.insertAtBeginning(2);
+        llist.insertAtEnd(3);
+        llist.insertAtPosition(4, 1);
+
+        System.out.println("Linked list after insertion:");
+        llist.printList();
+
+        llist.deleteNode(2);
+        System.out.println("Linked list after deletion:");
+        llist.printList();
+
+        int key = 3;
+        if (llist.searchNode(key)) {
+            System.out.println(key + " is found in the list.");
+        } else {
+            System.out.println(key + " is not found in the list.");
+        }
+
+        llist.reverseList();
+        System.out.println("Linked list after reversal:");
+        llist.printList();
+    }
+}
+```
+
+### **Explanation of Commands:**
+
+1. **C Language:**
+   - **`malloc(sizeof(struct Node))`**: Allocates memory for a new node.
+   - **`free(temp)`**: Frees the memory of the deleted node.
+   - **`printf("%d -> ", node->data)`**: Prints the data of the current node.
+
+2. **Python:**
+   - **`self.head = new_node`**: Updates the head to point to the new node.
+   - **`while last.next:`**: Traverses the list until the last node.
+   - **`print(temp.data, end=" -> ")`**: Prints the data of the current node.
+
+3. **Java:**
+   - **`new Node(new_data)`**: Creates a new node with the given data.
+   - **`while (last.next != null)`**: Traverses the list until the last node.
+   - **`System.out.print(temp.data + " -> ")`**: Prints the data of the current node.
+
+These implementations cover all the basic operations on a singly linked list in C, Python, and Java.
