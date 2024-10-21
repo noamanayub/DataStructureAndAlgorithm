@@ -207,3 +207,306 @@ Each implementation follows the LIFO principle and supports the basic operations
 <hr>
 <hr>
 <hr>
+
+### 5. Queues
+
+#### Definition and Properties
+A queue is a linear data structure that follows the First In, First Out (FIFO) principle. This means that the first element added to the queue will be the first one to be removed. The two primary operations that can be performed on a queue are:
+- **Enqueue**: Adds an element to the end of the queue.
+- **Dequeue**: Removes the front element from the queue.
+- **Peek (or Front)**: Returns the front element of the queue without removing it.
+
+#### Types of Queues
+1. **Simple Queue**: A basic queue with operations limited to enqueue and dequeue.
+2. **Circular Queue**: A queue where the last position is connected back to the first position to make a circle.
+3. **Priority Queue**: A queue where each element has a priority, and elements are dequeued based on their priority.
+4. **Double-ended Queue (Deque)**: A queue where elements can be added or removed from both ends.
+
+#### Operations
+1. **Enqueue**: Adds an element to the end of the queue.
+2. **Dequeue**: Removes the front element from the queue.
+3. **Peek (or Front)**: Returns the front element of the queue without removing it.
+
+#### Applications
+1. **Task Scheduling**: Queues are used in operating systems to manage tasks or processes.
+2. **Buffer Management**: Queues are used in buffering data streams, such as in networking or multimedia applications.
+
+### Simple Queue Implementation in C
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_SIZE 100
+
+typedef struct {
+    int data[MAX_SIZE];
+    int front, rear;
+} Queue;
+
+void initialize(Queue *q) {
+    q->front = -1;
+    q->rear = -1;
+}
+
+int isEmpty(Queue *q) {
+    return q->front == -1;
+}
+
+int isFull(Queue *q) {
+    return q->rear == MAX_SIZE - 1;
+}
+
+void enqueue(Queue *q, int value) {
+    if (isFull(q)) {
+        printf("Queue Overflow\n");
+        return;
+    }
+    if (isEmpty(q)) {
+        q->front = 0;
+    }
+    q->data[++q->rear] = value;
+}
+
+int dequeue(Queue *q) {
+    if (isEmpty(q)) {
+        printf("Queue Underflow\n");
+        return -1; // Assuming -1 as an error code
+    }
+    int value = q->data[q->front];
+    if (q->front == q->rear) {
+        q->front = q->rear = -1;
+    } else {
+        q->front++;
+    }
+    return value;
+}
+
+int peek(Queue *q) {
+    if (isEmpty(q)) {
+        printf("Queue is Empty\n");
+        return -1; // Assuming -1 as an error code
+    }
+    return q->data[q->front];
+}
+
+int main() {
+    Queue q;
+    initialize(&q);
+
+    enqueue(&q, 10);
+    enqueue(&q, 20);
+    enqueue(&q, 30);
+
+    printf("Front element: %d\n", peek(&q));
+
+    printf("Dequeued element: %d\n", dequeue(&q));
+    printf("Dequeued element: %d\n", dequeue(&q));
+
+    printf("Front element: %d\n", peek(&q));
+
+    return 0;
+}
+```
+
+### Circular Queue Implementation in C
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_SIZE 5
+
+typedef struct {
+    int data[MAX_SIZE];
+    int front, rear;
+} CircularQueue;
+
+void initialize(CircularQueue *q) {
+    q->front = -1;
+    q->rear = -1;
+}
+
+int isEmpty(CircularQueue *q) {
+    return q->front == -1;
+}
+
+int isFull(CircularQueue *q) {
+    return (q->rear + 1) % MAX_SIZE == q->front;
+}
+
+void enqueue(CircularQueue *q, int value) {
+    if (isFull(q)) {
+        printf("Queue Overflow\n");
+        return;
+    }
+    if (isEmpty(q)) {
+        q->front = 0;
+    }
+    q->rear = (q->rear + 1) % MAX_SIZE;
+    q->data[q->rear] = value;
+}
+
+int dequeue(CircularQueue *q) {
+    if (isEmpty(q)) {
+        printf("Queue Underflow\n");
+        return -1; // Assuming -1 as an error code
+    }
+    int value = q->data[q->front];
+    if (q->front == q->rear) {
+        q->front = q->rear = -1;
+    } else {
+        q->front = (q->front + 1) % MAX_SIZE;
+    }
+    return value;
+}
+
+int peek(CircularQueue *q) {
+    if (isEmpty(q)) {
+        printf("Queue is Empty\n");
+        return -1; // Assuming -1 as an error code
+    }
+    return q->data[q->front];
+}
+
+int main() {
+    CircularQueue q;
+    initialize(&q);
+
+    enqueue(&q, 10);
+    enqueue(&q, 20);
+    enqueue(&q, 30);
+
+    printf("Front element: %d\n", peek(&q));
+
+    printf("Dequeued element: %d\n", dequeue(&q));
+    printf("Dequeued element: %d\n", dequeue(&q));
+
+    printf("Front element: %d\n", peek(&q));
+
+    return 0;
+}
+```
+
+### Priority Queue Implementation in Python
+
+```python
+import heapq
+
+class PriorityQueue:
+    def __init__(self):
+        self.elements = []
+
+    def is_empty(self):
+        return len(self.elements) == 0
+
+    def enqueue(self, item, priority):
+        heapq.heappush(self.elements, (priority, item))
+
+    def dequeue(self):
+        if self.is_empty():
+            print("Queue Underflow")
+            return None
+        return heapq.heappop(self.elements)[1]
+
+    def peek(self):
+        if self.is_empty():
+            print("Queue is Empty")
+            return None
+        return self.elements[0][1]
+
+# Example usage
+pq = PriorityQueue()
+pq.enqueue("Task 1", 3)
+pq.enqueue("Task 2", 1)
+pq.enqueue("Task 3", 2)
+
+print("Front element:", pq.peek())
+
+print("Dequeued element:", pq.dequeue())
+print("Dequeued element:", pq.dequeue())
+
+print("Front element:", pq.peek())
+```
+
+### Double-ended Queue (Deque) Implementation in Java
+
+```java
+import java.util.ArrayDeque;
+
+class Deque {
+    private ArrayDeque<Integer> deque;
+
+    public Deque() {
+        deque = new ArrayDeque<>();
+    }
+
+    public boolean isEmpty() {
+        return deque.isEmpty();
+    }
+
+    public void enqueueFront(int item) {
+        deque.addFirst(item);
+    }
+
+    public void enqueueRear(int item) {
+        deque.addLast(item);
+    }
+
+    public int dequeueFront() {
+        if (isEmpty()) {
+            System.out.println("Deque Underflow");
+            return -1; // Assuming -1 as an error code
+        }
+        return deque.removeFirst();
+    }
+
+    public int dequeueRear() {
+        if (isEmpty()) {
+            System.out.println("Deque Underflow");
+            return -1; // Assuming -1 as an error code
+        }
+        return deque.removeLast();
+    }
+
+    public int peekFront() {
+        if (isEmpty()) {
+            System.out.println("Deque is Empty");
+            return -1; // Assuming -1 as an error code
+        }
+        return deque.getFirst();
+    }
+
+    public int peekRear() {
+        if (isEmpty()) {
+            System.out.println("Deque is Empty");
+            return -1; // Assuming -1 as an error code
+        }
+        return deque.getLast();
+    }
+
+    public static void main(String[] args) {
+        Deque deque = new Deque();
+        deque.enqueueFront(10);
+        deque.enqueueRear(20);
+        deque.enqueueFront(5);
+
+        System.out.println("Front element: " + deque.peekFront());
+        System.out.println("Rear element: " + deque.peekRear());
+
+        System.out.println("Dequeued front element: " + deque.dequeueFront());
+        System.out.println("Dequeued rear element: " + deque.dequeueRear());
+
+        System.out.println("Front element: " + deque.peekFront());
+        System.out.println("Rear element: " + deque.peekRear());
+    }
+}
+```
+
+### Summary
+- **Simple Queue**: A basic queue with operations limited to enqueue and dequeue.
+- **Circular Queue**: A queue where the last position is connected back to the first position to make a circle.
+- **Priority Queue**: A queue where each element has a priority, and elements are dequeued based on their priority.
+- **Double-ended Queue (Deque)**: A queue where elements can be added or removed from both ends.
+
+Each implementation follows the FIFO principle and supports the basic operations of a queue: enqueue, dequeue, and peek. The choice of language and type of queue may depend on the specific requirements and constraints of the project.
